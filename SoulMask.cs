@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -56,8 +56,7 @@ namespace WindowsGSM.Plugins
         private string GetAdditional()
         {
             string EchoPort = (int.Parse(_serverData.ServerQueryPort) + 1).ToString();
-            return $" -log -UTF8Output -MultiHome=0.0.0.0 -EchoPort=\"{EchoPort}\" -forcepassthrough -initbackup -saving=600 -backupinterval=900 -adminpsw=adminpass";
-
+            return $" -log -UTF8Output -MultiHome=0.0.0.0 -EchoPort=\"{EchoPort}\" -forcepassthrough -initbackup -saving=600 -backupinterval=900 -adminpsw=\"adminpass\" -pvp -PSW=\"Server_Income_Password\" ";
         }
 
         // - Create a default cfg for the game server after installation
@@ -78,7 +77,7 @@ namespace WindowsGSM.Plugins
             param.Append(string.IsNullOrWhiteSpace(_serverData.ServerQueryPort) ? string.Empty : $" -QueryPort={_serverData.ServerQueryPort}");
             param.Append(string.IsNullOrWhiteSpace(_serverData.ServerName) ? string.Empty : $" -SteamServerName=\"{_serverData.ServerName}\"");
             param.Append(string.IsNullOrWhiteSpace(_serverData.ServerMaxPlayer) ? string.Empty : $" -MaxPlayers={_serverData.ServerMaxPlayer}");
-            param.Append(string.IsNullOrWhiteSpace(_serverData.ServerGSLT) ? string.Empty : $" -PrivateServerPassword={_serverData.ServerGSLT}");
+            param.Append(string.IsNullOrWhiteSpace(_serverData.ServerGSLT) ? string.Empty : $" -PSW={_serverData.ServerGSLT}");
             param.Append(string.IsNullOrWhiteSpace(_serverData.ServerParam) ? string.Empty : $" {_serverData.ServerParam}");
 
             // Prepare Process
