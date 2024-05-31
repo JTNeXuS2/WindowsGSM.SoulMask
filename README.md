@@ -9,6 +9,8 @@ Place author.png, SoulMask.cs, SoulMask.png in the WindowsGSM\plugins\SoulMask.c
 
 Additional WIKI
 https://soulmask.fandom.com/wiki/Private_Server
+InGame Config
+serverfiles\WS\Saved\GameplaySettings\GameXishu.json
 
 ### [Donate for me](https://yoomoney.ru/to/4100116619431314)
 #
