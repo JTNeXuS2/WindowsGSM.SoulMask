@@ -62,7 +62,7 @@ namespace WindowsGSM.Plugins
         // - Create a default cfg for the game server after installation
         public async void CreateServerCFG()
         {
-            createBaseConfig();
+
         }
 
         // - Start server function, return its Process to WindowsGSM
