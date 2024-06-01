@@ -30,8 +30,9 @@ Necessarily change PASS!
 
 Additional WIKI
 https://soulmask.fandom.com/wiki/Private_Server
-InGame Config
-serverfiles\WS\Saved\GameplaySettings\GameXishu.json
+  
+# InGame editable server Config
+    serverfiles\WS\Saved\GameplaySettings\GameXishu.json
 
 ### [Donate for me](https://yoomoney.ru/to/4100116619431314)
 #
