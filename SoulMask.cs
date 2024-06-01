@@ -21,7 +21,7 @@ namespace WindowsGSM.Plugins
             name = "WindowsGSM.SoulMask", // WindowsGSM.XXXX
             author = "Illidan",
             description = "WindowsGSM plugin for supporting SoulMask Dedicated Server",
-            version = "1.0 ",
+            version = "1.2",
             url = "https://github.com/JTNeXuS2/WindowsGSM.SoulMask", // Github repository link (Best practice)
             color = "#8802db" // Color Hex
         };
@@ -39,7 +39,7 @@ namespace WindowsGSM.Plugins
         public override string StartPath => @"WS\Binaries\Win64\WSServer-Win64-Shipping.exe"; // Game server start path
         public string FullName = "SoulMask Dedicated Server"; // Game server FullName
         public bool AllowsEmbedConsole = true;  // Does this server support output redirect?
-        public int PortIncrements = 0; // This tells WindowsGSM how many ports should skip after installation
+        public int PortIncrements = 3; // This tells WindowsGSM how many ports should skip after installation
         public object QueryMethod = new A2S(); // Query method should be use on current server type. Accepted value: null or new A2S() or new FIVEM() or new UT3()
 
         public static string ConfigServerName = RandomNumberGenerator.Generate12DigitRandomNumber();
@@ -198,6 +198,30 @@ namespace WindowsGSM.Plugins
             Error = error;
             await Task.Run(() => { p.WaitForExit(); });
             return p;
+        }
+
+        public bool IsInstallValid()
+        {
+            return File.Exists(Functions.ServerPath.GetServersServerFiles(_serverData.ServerID, StartPath));
+        }
+
+        public bool IsImportValid(string path)
+        {
+            string exePath = Path.Combine(path, "PackageInfo.bin");
+            Error = $"Invalid Path! Fail to find {Path.GetFileName(exePath)}";
+            return File.Exists(exePath);
+        }
+
+        public string GetLocalBuild()
+        {
+            var steamCMD = new Installer.SteamCMD();
+            return steamCMD.GetLocalBuild(_serverData.ServerID, AppId);
+        }
+
+        public async Task<string> GetRemoteBuild()
+        {
+            var steamCMD = new Installer.SteamCMD();
+            return await steamCMD.GetRemoteBuild(AppId);
         }
     }
 
