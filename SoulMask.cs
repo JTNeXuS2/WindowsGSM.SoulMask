@@ -56,7 +56,7 @@ namespace WindowsGSM.Plugins
         private string GetAdditional()
         {
             string EchoPort = (int.Parse(_serverData.ServerQueryPort) + 1).ToString();
-            return $" -log -UTF8Output -MultiHome=0.0.0.0 -EchoPort=\"{EchoPort}\" -forcepassthrough -serverid=1 -initbackup -saving=600 -backupinterval=900 -adminpsw=\"adminpass\" -pvp ";
+            return $" -log -UTF8Output -MultiHome=0.0.0.0 -EchoPort=\"{EchoPort}\" -forcepassthrough -serverid=1 -initbackup -saving=600 -backupinterval=900 -adminpsw=\"adminpass\" -serverpm=2 -pvp -GongHuiMaxMember=10";
         }
 
         // - Create a default cfg for the game server after installation
