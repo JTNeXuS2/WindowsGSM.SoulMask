@@ -21,7 +21,7 @@ namespace WindowsGSM.Plugins
             name = "WindowsGSM.SoulMask", // WindowsGSM.XXXX
             author = "Illidan",
             description = "WindowsGSM plugin for supporting SoulMask Dedicated Server",
-            version = "1.2",
+            version = "1.4",
             url = "https://github.com/JTNeXuS2/WindowsGSM.SoulMask", // Github repository link (Best practice)
             color = "#8802db" // Color Hex
         };
@@ -39,25 +39,28 @@ namespace WindowsGSM.Plugins
         public override string StartPath => @"WS\Binaries\Win64\WSServer-Win64-Shipping.exe"; // Game server start path
         public string FullName = "SoulMask Dedicated Server"; // Game server FullName
         public bool AllowsEmbedConsole = true;  // Does this server support output redirect?
-        public int PortIncrements = 3; // This tells WindowsGSM how many ports should skip after installation
+        public int PortIncrements = 4; // This tells WindowsGSM how many ports should skip after installation
         public object QueryMethod = new A2S(); // Query method should be use on current server type. Accepted value: null or new A2S() or new FIVEM() or new UT3()
-
-        public static string ConfigServerName = RandomNumberGenerator.Generate12DigitRandomNumber();
 
         // - Game server default values
         public string ServerName = "SoulMask Dedicated Server";
         public string Defaultmap = "Level01_Main"; // Original (MapName)
-        public string Maxplayers = "50"; // WGSM reads this as string but originally it is number or int (MaxPlayers)
+        public string Maxplayers = "100"; // WGSM reads this as string but originally it is number or int (MaxPlayers)
         public string Port = "20700"; // WGSM reads this as string but originally it is number or int
         public string QueryPort = "20701"; // WGSM reads this as string but originally it is number or int (SteamQueryPort)
         public string EchoPort;
+        public string RconPort;
         public string Additional => GetAdditional();
-
         private string GetAdditional()
         {
             string EchoPort = (int.Parse(_serverData.ServerQueryPort) + 1).ToString();
-            return $" -log -UTF8Output -MultiHome=0.0.0.0 -EchoPort=\"{EchoPort}\" -forcepassthrough -serverid=1 -initbackup -saving=600 -backupinterval=900 -adminpsw=\"adminpass\" -serverpm=2 -pvp -GongHuiMaxMember=10";
+            string RconPort = (int.Parse(_serverData.ServerQueryPort) + 2).ToString();
+            return $" -log -UTF8Output -MultiHome=0.0.0.0 -serverid=0 -rconaddr=0.0.0.0 -rconport=\"{RconPort}\" -EchoPort=\"{EchoPort}\" -forcepassthrough -initbackup -saving=180 -backupinterval=720 -adminpsw=adminpass -rconpsw=rconpass -serverpm=2 -GongHuiMaxMember=10";
         }
+
+
+        private Dictionary<string, string> configData = new Dictionary<string, string>();
+
 
         // - Create a default cfg for the game server after installation
         public async void CreateServerCFG()
@@ -69,6 +72,11 @@ namespace WindowsGSM.Plugins
         public async Task<Process> Start()
         {
             string shipExePath = Functions.ServerPath.GetServersServerFiles(_serverData.ServerID, StartPath);
+            if (!File.Exists(shipExePath))
+            {
+                Error = $"{Path.GetFileName(shipExePath)} not found ({shipExePath})";
+                return null;
+            }
 
             // Prepare start parameter
             var param = new StringBuilder();
@@ -87,8 +95,9 @@ namespace WindowsGSM.Plugins
                     WorkingDirectory = ServerPath.GetServersServerFiles(_serverData.ServerID),
                     FileName = shipExePath,
                     Arguments = param.ToString(),
-                    WindowStyle = ProcessWindowStyle.Normal,
+                    WindowStyle = ProcessWindowStyle.Hidden,
                     UseShellExecute = false
+
                 },
                 EnableRaisingEvents = true
             };
@@ -108,11 +117,6 @@ namespace WindowsGSM.Plugins
             // Start Process
             try
             {
-				// Модификация для вызова batch перед стартом сервера
-                //await RunBatchScript();
-				var scriptPath = Path.Combine(ServerPath.GetServersServerFiles(_serverData.ServerID), "OnStart.bat");
-				await RunExternalScriptAsync(scriptPath);
-				// END
                 p.Start();
                 if (AllowsEmbedConsole)
                 {
@@ -128,67 +132,21 @@ namespace WindowsGSM.Plugins
                 return null; // return null if fail to start
             }
         }
-		// END
-///////////////////////////////////////////////////////
-    public async Task RunExternalScriptAsync(string scriptPath)
-    {
-        using (Process batch = new Process())
-        {
-            batch.StartInfo.FileName = "cmd.exe";
-            batch.StartInfo.Arguments = $"/c \"{scriptPath}\""; // /c flag runs the command and terminates
-			batch.StartInfo.WorkingDirectory = Path.Combine(ServerPath.GetServersServerFiles(_serverData.ServerID));
-            //process.StartInfo.UseShellExecute = false;
-            if (AllowsEmbedConsole)
-            {
-                batch.StartInfo.CreateNoWindow = true;
-                batch.StartInfo.UseShellExecute = false;
-                batch.StartInfo.RedirectStandardInput = true;
-                batch.StartInfo.RedirectStandardOutput = true;
-                batch.StartInfo.RedirectStandardError = true;
-                var serverConsole = new ServerConsole(_serverData.ServerID);
-                batch.OutputDataReceived += serverConsole.AddOutput;
-                batch.ErrorDataReceived += serverConsole.AddOutput;
-            }
 
-            // Start the process asynchronously
-            batch.Start();
-            if (AllowsEmbedConsole)
-            {
-                batch.BeginOutputReadLine();
-                batch.BeginErrorReadLine();
-            }
-            // Wait asynchronously for the script to complete
-            await WaitForExitAsync(batch);
-            // Call the closeProcess function with the process as an argument
-            //closeProcess?.Invoke(process);
-            // Script completed
-            Console.WriteLine("Script exited");
-        }
-    }
-    static Task WaitForExitAsync(Process batch)
-    {
-        var tcs = new TaskCompletionSource<object>();
-
-        batch.EnableRaisingEvents = true;
-        batch.Exited += (sender, e) => tcs.TrySetResult(null);
-
-        if (batch.HasExited)
-        {
-            tcs.TrySetResult(null);
-        }
-
-        return tcs.Task;
-    }
-///////////////////////////////////////////////////////
         // - Stop server function
         public async Task Stop(Process p)
         {
-			await Task.Run(() =>
-			{
-				 Functions.ServerConsole.SetMainWindow(p.MainWindowHandle);
-				 Functions.ServerConsole.SendWaitToMainWindow("^c");
-			});
-			await Task.Delay(20000);
+            await Task.Run(() =>
+            {
+                Functions.ServerConsole.SetMainWindow(p.MainWindowHandle);
+                Functions.ServerConsole.SendWaitToMainWindow("backup world");
+                Task.Delay(100);
+                Functions.ServerConsole.SendWaitToMainWindow("quit 5");
+                Task.Delay(5000);
+                Functions.ServerConsole.SendWaitToMainWindow("^c");
+            });
+            await Task.Delay(20000);
+            p.Kill();
         }
 
         // - Update server function
@@ -222,26 +180,6 @@ namespace WindowsGSM.Plugins
         {
             var steamCMD = new Installer.SteamCMD();
             return await steamCMD.GetRemoteBuild(AppId);
-        }
-    }
-
-    public class RandomNumberGenerator
-    {
-        public static string Generate12DigitRandomNumber()
-        {
-            Random random = new Random();
-            string twelveDigitNumber = GenerateRandom12Digits(random);
-            return twelveDigitNumber;
-        }
-
-        private static string GenerateRandom12Digits(Random random)
-        {
-            string result = "";
-            for (int i = 0; i < 12; i++)
-            {
-                result += random.Next(0, 10).ToString(); // Generates a random digit between 0 and 9
-            }
-            return result;
         }
     }
 }
