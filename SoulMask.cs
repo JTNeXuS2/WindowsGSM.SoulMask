@@ -55,7 +55,7 @@ namespace WindowsGSM.Plugins
         {
             string EchoPort = (int.Parse(_serverData.ServerQueryPort) + 1).ToString();
             string RconPort = (int.Parse(_serverData.ServerQueryPort) + 2).ToString();
-            return $" -log -UTF8Output -MultiHome=0.0.0.0 -serverid=0 -rconaddr=0.0.0.0 -rconport=\"{RconPort}\" -EchoPort=\"{EchoPort}\" -forcepassthrough -initbackup -saving=180 -backupinterval=720 -adminpsw=adminpass -rconpsw=rconpass -serverpm=2 -GongHuiMaxMember=10";
+            return $" -log -UTF8Output -MultiHome=0.0.0.0 -serverid=0 -rconaddr=0.0.0.0 -rconport=\"{RconPort}\" -EchoPort=\"{EchoPort}\" -forcepassthrough -initbackup -saving=180 -backupinterval=720 -dbexpired=3 -adminpsw=adminpass -rconpsw=rconpass -serverpm=2 -GongHuiMaxMember=10";
         }
 
 
