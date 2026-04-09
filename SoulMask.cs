@@ -44,7 +44,7 @@ namespace WindowsGSM.Plugins
 
         // - Game server default values
         public string ServerName = "SoulMask Dedicated Server";
-        public string Defaultmap = "Level01_Main"; // Original (MapName)
+        public string Defaultmap = "DLC_Level01_Main"; // Original (Level01_Main)
         public string Maxplayers = "100"; // WGSM reads this as string but originally it is number or int (MaxPlayers)
         public string Port = "20700"; // WGSM reads this as string but originally it is number or int
         public string QueryPort = "20701"; // WGSM reads this as string but originally it is number or int (SteamQueryPort)
