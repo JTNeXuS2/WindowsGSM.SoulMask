@@ -21,7 +21,7 @@ namespace WindowsGSM.Plugins
             name = "WindowsGSM.SoulMask", // WindowsGSM.XXXX
             author = "Illidan",
             description = "WindowsGSM plugin for supporting SoulMask Dedicated Server",
-            version = "1.4",
+            version = "1.5",
             url = "https://github.com/JTNeXuS2/WindowsGSM.SoulMask", // Github repository link (Best practice)
             color = "#8802db" // Color Hex
         };
